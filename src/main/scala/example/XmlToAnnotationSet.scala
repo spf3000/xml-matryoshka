@@ -18,6 +18,7 @@ case class El[A](label: String, childs: IList[A]) extends X[A]
 
 case class OTag(name: String, start: Natural, length: Natural)
 
+potato
 
 implicit val XTraverse = new Traverse[X] {
   def traverseImpl [G[_]: Applicative, A, B](fa: X[A])(f: A => G[B]) =
@@ -26,12 +27,19 @@ implicit val XTraverse = new Traverse[X] {
 }
 }
 
-val stateAlg: AlgebraM[State[Natural, ?], X, IList[OTag]] = {
-  case El(l,x) =>
-     for {
-    _ <- State.modify[Natural](_+getStart(l))
-    s <- State.get[Natural]
-     } yield (OTag(l, s, Natural(l.length)) :: x.flatten)
+//val stateAlg: AlgebraM[State[Natural, ?], X, IList[OTag]] = {
+   /** Transform a structure `F` to a structure `G`, in top-down fashion,
+    * accumulating effects in the monad `M`.
+    * @group algebras
+    */
+
+  val stateAlg: TransformM[State[Natural,?], OTag, X, IList] = {
+    case El(l,x) =>
+       for {
+        _ <- State.modify[Natural](_+getStart(l))
+        s <- State.get[Natural]
+     } yield (OTag(l, s, Natural(l.length)) :: x)
+
   }
 
 

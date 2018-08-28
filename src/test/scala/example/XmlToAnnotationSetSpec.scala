@@ -3,6 +3,7 @@ package example
 import matryoshka._
 import matryoshka.data._
 import matryoshka.implicits._
+import matryoshka.data._
 
 import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
@@ -18,10 +19,11 @@ class XSpec extends Specification {
 
   "X should do something" >> {
 
-    Fix[X](El(
+    Mu[X](El(
       "week", IList(
-        Fix[X](El("day",
-          IList(Fix[X](El("Mon", IList())))))))).cataM[State[Natural,?], IList[OTag]](stateAlg).run(Natural.zero) must beEqualTo ("hello")
+        Mu[X](El("day",
+          IList(Mu[X](El("Mon", IList()))))))))
+            .transCataM[State[Natural,?], OTag, IList](stateAlg).run(Natural.zero) must beEqualTo ("hello")
 
   }
 
